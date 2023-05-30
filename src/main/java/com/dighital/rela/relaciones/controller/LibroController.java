@@ -9,6 +9,8 @@ import com.dighital.rela.relaciones.service.LibroService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,17 +38,31 @@ public class LibroController {
         return libroService.findAll();
     }
     
-    @PostMapping("/nuevo/{id}")
-    public String save(@PathVariable ("id") Long id, @RequestBody LibroDto libroDto){
+   // @PostMapping("/nuevo/{id}")
+    //public String save(@PathVariable ("id") Long id, @RequestBody LibroDto libroDto){
+      //  Autor autor = autorService.findById(id).get();
+        //if(autor == null){
+         //   return "No se encontro el id expecificado";
+        //}
+        //autor.setId(id);
+        //Libro libro = new Libro (libroDto.getTitulo(), libroDto.getPaginas(), libroDto.getDeposito(), libroDto.getAutor());
+        //libro.setAutor(autor);
+        //libroService.save(libro);
+        //return "Libro creado correctamente";
+    //}
+    
+    @PostMapping("/new/{id}")
+    public ResponseEntity<?> save (@PathVariable ("id") Long id, @RequestBody LibroDto libroDto){
         Autor autor = autorService.findById(id).get();
-        if(autor == null){
-            return "No se encontro el id expecificado";
-        }
+        if (autor.getId() == null){
+            return new ResponseEntity(new Mensaje("Id de autor no encontrado"), HttpStatus.BAD_REQUEST);
+        }else{
         autor.setId(id);
-        Libro libro = new Libro (libroDto.getTitulo(), libroDto.getPaginas(), libroDto.getDeposito(), libroDto.getAutor());
+        Libro libro = new Libro(libroDto.getTitulo(), libroDto.getPaginas(), libroDto.getDeposito(), libroDto.getAutor());
         libro.setAutor(autor);
         libroService.save(libro);
-        return "Libro creado correctamente";
+        return new ResponseEntity(new Mensaje("Libro creado correctamente y asociado a su Autor"), HttpStatus.OK);
+        }
     }
     
     @DeleteMapping("/eliminar/{id}")
